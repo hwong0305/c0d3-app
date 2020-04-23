@@ -14,13 +14,13 @@ describe('Chat Signup', () => {
   })
   test('ChatSignUp - should resolve if response is 201', async () => {
     fetch.mockResolvedValue({ status: 201 })
-    expect(
+    return expect(
       chatSignUp(userArgs.username, userArgs.password, userArgs.email)
     ).resolves.toEqual({ success: true })
   })
   test('ChatSignUp - should reject if response is 401', async () => {
     fetch.mockResolvedValue({ status: 401 })
-    expect(
+    return expect(
       chatSignUp(userArgs.username, userArgs.password, userArgs.email)
     ).resolves.toEqual({
       success: false,
@@ -29,7 +29,7 @@ describe('Chat Signup', () => {
   })
   test('ChatSignUp - should reject if response is 403', async () => {
     fetch.mockResolvedValue({ status: 403 })
-    expect(
+    return expect(
       chatSignUp(userArgs.username, userArgs.password, userArgs.email)
     ).resolves.toEqual({
       success: false,
@@ -38,7 +38,7 @@ describe('Chat Signup', () => {
   })
   test('ChatSignUp - should reject if response status is invalid', async () => {
     fetch.mockResolvedValue({ status: 418 }) // MatterMost only returns 201, 401 and 403
-    expect(
+    return expect(
       chatSignUp(userArgs.username, userArgs.password, userArgs.email)
     ).resolves.toEqual({
       success: false,
@@ -47,7 +47,7 @@ describe('Chat Signup', () => {
   })
   test('ChatSignUp - should reject if internal server error', async () => {
     fetch.mockResolvedValue({ status: 418 }) // MatterMost only returns 201, 401 and 403
-    expect(
+    return expect(
       chatSignUp(userArgs.username, userArgs.password, userArgs.email)
     ).resolves.toEqual({
       success: false,
@@ -56,7 +56,7 @@ describe('Chat Signup', () => {
   })
   test('ChatSignUp - should reject if internal server error', async () => {
     fetch.mockRejectedValue({})
-    expect(
+    return expect(
       chatSignUp(userArgs.username, userArgs.password, userArgs.email)
     ).resolves.toEqual({
       success: false,

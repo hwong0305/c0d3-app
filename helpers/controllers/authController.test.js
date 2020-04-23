@@ -20,7 +20,7 @@ describe('auth controller', () => {
   })
 
   test('Login - should throw error when session is null', async () => {
-    expect(
+    return expect(
       login({}, userArgs, { req: { session: null } })
     ).rejects.toThrowError('')
   })
