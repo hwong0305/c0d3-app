@@ -1,10 +1,10 @@
 import db from '../dbload'
 import bcrypt from 'bcrypt'
 import { nanoid } from 'nanoid'
-import { Request } from 'express'
 import { UserInputError } from 'apollo-server-micro'
 import { signupValidation } from '../formValidation'
 import { chatSignUp } from '../mattermost'
+import { LoggedRequest } from '../../@types/helpers'
 
 const { User } = db
 
@@ -24,14 +24,14 @@ type SignUp = {
 export const login = async (
   _parent: void,
   arg: Login,
-  ctx: { req: Request }
+  ctx: { req: LoggedRequest }
 ) => {
-  try {
-    const {
-      req: { session }
-    } = ctx
-    const { username, password } = arg
+  const {
+    req: { logger, uid, session }
+  } = ctx
+  const { username, password } = arg
 
+  try {
     if (!session) {
       throw new Error('Session Error')
     }
@@ -52,14 +52,25 @@ export const login = async (
       username: user.username
     }
   } catch (err) {
+    logger.error(
+      JSON.stringify({
+        id: uid,
+        message: err.message,
+        err
+      })
+    )
     throw new Error(err)
   }
 }
 
-export const logout = async (_parent: void, _: void, ctx: { req: Request }) => {
+export const logout = async (
+  _parent: void,
+  _: void,
+  ctx: { req: LoggedRequest }
+) => {
   return new Promise(async (resolve, reject) => {
     const {
-      req: { session }
+      req: { uid, logger, session }
     } = ctx
 
     if (!session) {
@@ -71,6 +82,13 @@ export const logout = async (_parent: void, _: void, ctx: { req: Request }) => {
 
     session.destroy(err => {
       if (err) {
+        logger.error(
+          JSON.stringify({
+            id: uid,
+            message: 'Error destorying session',
+            err
+          })
+        )
         reject({
           success: false,
           error: err.message
@@ -84,7 +102,14 @@ export const logout = async (_parent: void, _: void, ctx: { req: Request }) => {
   })
 }
 
-export const signup = async (_parent: void, arg: SignUp) => {
+export const signup = async (
+  _parent: void,
+  arg: SignUp,
+  ctx: { req: LoggedRequest }
+) => {
+  const {
+    req: { uid, logger }
+  } = ctx
   try {
     const { firstName, lastName, username, password, email } = arg
 
@@ -140,6 +165,11 @@ export const signup = async (_parent: void, arg: SignUp) => {
       username: userRecord.username
     }
   } catch (err) {
+    logger.error({
+      id: uid,
+      message: err.message,
+      err
+    })
     throw new Error(err)
   }
 }

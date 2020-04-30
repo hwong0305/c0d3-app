@@ -28,7 +28,9 @@ describe('auth controller', () => {
   test('Login - should throw error if user cannot be found', async () => {
     db.User.findOne = jest.fn().mockReturnValue(null)
     return expect(
-      login({}, userArgs, { req: { session: {} } })
+      login({}, userArgs, {
+        req: { session: {}, uid: 'abc', logger: { error: jest.fn() } }
+      })
     ).rejects.toThrowError('User does not exist')
   })
 
@@ -36,14 +38,18 @@ describe('auth controller', () => {
     db.User.findOne = jest.fn().mockReturnValue({})
     bcrypt.compare = jest.fn().mockReturnValue(false)
     return expect(
-      login({}, userArgs, { req: { session: {} } })
+      login({}, userArgs, {
+        req: { session: {}, uid: 'abc', logger: { error: jest.fn() } }
+      })
     ).rejects.toThrowError('Password is invalid')
   })
 
   test('Login - should return success true if successful login', async () => {
     db.User.findOne = jest.fn().mockReturnValue({ username: 'testuser' })
     bcrypt.compare = jest.fn().mockReturnValue(true)
-    const result = await login({}, userArgs, { req: { session: {} } })
+    const result = await login({}, userArgs, {
+      req: { session: {}, uid: 'abc', logger: { error: jest.fn() } }
+    })
     expect(result).toEqual({
       success: true,
       username: 'testuser'
@@ -66,7 +72,11 @@ describe('auth controller', () => {
         inputCb({ message: 'OWNED BY TEST' })
       }
     }
-    logout({}, {}, { req: { session } }).catch(e => {
+    logout(
+      {},
+      {},
+      { req: { session, uid: 'abc', logger: { error: jest.fn() } } }
+    ).catch(e => {
       expect(e).toEqual({
         success: false,
         error: 'OWNED BY TEST'
@@ -80,7 +90,11 @@ describe('auth controller', () => {
         inputCb(false)
       }
     }
-    const result = await logout({}, {}, { req: { session } })
+    const result = await logout(
+      {},
+      {},
+      { req: { session }, uid: 'abc', logger: { error: jest.fn() } }
+    )
     expect(result).toEqual({
       success: true
     })
@@ -88,14 +102,20 @@ describe('auth controller', () => {
 
   test('Signup - should reject if user information is incomplete', async () => {
     return expect(
-      signup({}, {}, { req: { session: {} } })
+      signup(
+        {},
+        {},
+        { req: { session: {}, uid: 'abc', logger: { error: jest.fn() } } }
+      )
     ).rejects.toThrowError('Register form is not completely filled out')
   })
 
   test('Signup - should reject if user already exists', async () => {
     db.User.findOne = jest.fn().mockReturnValue({ username: 'c0d3user' })
     return expect(
-      signup({}, userArgs, { req: { session: {} } })
+      signup({}, userArgs, {
+        req: { session: {}, uid: 'abc', logger: { error: jest.fn() } }
+      })
     ).rejects.toThrowError('User already exists')
   })
 
@@ -105,7 +125,9 @@ describe('auth controller', () => {
       .mockReturnValueOnce(null)
       .mockReturnValue({ username: 'c0d3user' }) // Second call for User.findOne checks for email
     return expect(
-      signup({}, userArgs, { req: { session: {} } })
+      signup({}, userArgs, {
+        req: { session: {}, uid: 'abc', logger: { error: jest.fn() } }
+      })
     ).rejects.toThrowError('Email already exists')
   })
 
@@ -118,7 +140,9 @@ describe('auth controller', () => {
     )
 
     await expect(
-      signup({}, userArgs, { req: { session: {} } })
+      signup({}, userArgs, {
+        req: { session: {}, uid: 'abc', logger: { error: jest.fn() } }
+      })
     ).rejects.toThrowError('Invalid or missing parameter in mattermost request')
 
     expect(db.User.create).not.toBeCalled()
@@ -131,7 +155,9 @@ describe('auth controller', () => {
     chatSignUp.mockRejectedValueOnce('Mattermost Error')
 
     await expect(
-      signup({}, userArgs, { req: { session: {} } })
+      signup({}, userArgs, {
+        req: { session: {}, uid: 'abc', logger: { error: jest.fn() } }
+      })
     ).rejects.toThrow('Mattermost Error')
 
     expect(db.User.create).not.toBeCalled()
@@ -143,7 +169,9 @@ describe('auth controller', () => {
     chatSignUp.mockResolvedValueOnce({
       success: true
     })
-    const result = await signup({}, userArgs, { req: { session: {} } })
+    const result = await signup({}, userArgs, {
+      req: { session: {}, uid: 'abc', logger: { error: jest.fn() } }
+    })
     expect(result).toEqual({
       username: 'user'
     })
