@@ -483,20 +483,24 @@ exports[`Storyshots Components/Card With Failure 1`] = `
       className="card-body text-center pt-5 pb-5"
     >
       <svg
+        aria-hidden="true"
         className="mb-4 text-danger"
-        fill="currentColor"
-        height="100px"
-        viewBox="0 0 16 16"
-        width="100px"
-        xmlns="http://www.w3.org/2000/svg"
+        height={100}
+        role="img"
+        style={
+          Object {
+            "display": "inline-block",
+            "fill": "currentColor",
+            "userSelect": "none",
+            "verticalAlign": "text-bottom",
+          }
+        }
+        viewBox="0 0 14 16"
+        width={100}
       >
         <path
-          clipRule="evenodd"
-          d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
+          d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 011.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"
           fillRule="evenodd"
-        />
-        <path
-          d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"
         />
       </svg>
       <h1
