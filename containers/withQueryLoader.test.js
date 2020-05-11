@@ -2,7 +2,7 @@ import React from 'react'
 import withQueryLoader from '../containers/withQueryLoader'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { useQuery } from '@apollo/react-hooks'
-import NoData from '../../components/NoData'
+import NoData from '../components/NoData'
 
 jest.mock('@apollo/react-hooks')
 
