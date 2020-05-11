@@ -6,6 +6,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ext .js --ext .ts --ext .tsx",
+    "lint:fix": "eslint . --ext .js --ext .ts --ext .tsx --fix",
     "autofix": "eslint . --ext .js --ext .ts --ext .tsx --fix && svgo public/*.svg && svgo assets/**/*.svg",
     "storybook": "start-storybook -p $STORY_PORT -c .storybook -s ./public",
     "build-storybook": "build-storybook -c .storybook -s ./public",

@@ -7,6 +7,7 @@ export default gql`
   }
 
   type Mutation {
+    confirmEmail(confirmEmail: String!): AuthResponse
     login(username: String!, password: String!): AuthResponse
     logout: AuthResponse
     signup(

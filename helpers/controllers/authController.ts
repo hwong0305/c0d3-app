@@ -1,5 +1,6 @@
 import db from '../dbload'
 import bcrypt from 'bcrypt'
+import _ from 'lodash'
 import { nanoid } from 'nanoid'
 import { UserInputError, AuthenticationError } from 'apollo-server-micro'
 import { signupValidation } from '../formValidation'
@@ -154,5 +155,43 @@ export const signup = async (
       req.error(err)
     }
     throw new Error(err)
+  }
+}
+
+export const confirmEmail = async (
+  _parent: void,
+  arg: { confirmEmail: string },
+  ctx: { req: LoggedRequest }
+) => {
+  const { confirmEmail } = arg
+  const userId = _.get(ctx, 'req.session.userId', null)
+
+  if (!userId) {
+    throw new AuthenticationError('You must be logged in')
+  }
+
+  if (!confirmEmail) {
+    throw new UserInputError('Email Confirmation Token was not provided')
+  }
+
+  const user = await User.findOne({
+    where: {
+      id: userId
+    }
+  })
+
+  if (!user) {
+    throw new AuthenticationError('Current loggedin user is not valid')
+  }
+
+  if (confirmEmail !== user.emailVerificationToken) {
+    throw new UserInputError('Email Confirmation Token is not valid')
+  }
+
+  user.emailVerificationToken = ''
+  await user.save()
+
+  return {
+    success: true
   }
 }
