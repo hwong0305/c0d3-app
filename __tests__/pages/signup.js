@@ -1,5 +1,7 @@
+jest.mock('next/router')
 import React from 'react'
 import { render, fireEvent, wait, act } from '@testing-library/react'
+import { useRouter } from 'next/router'
 import Signup from '../../pages/signup'
 import * as signupHelper from '../../helpers/signupUser'
 
@@ -60,7 +62,11 @@ describe('Signup Page', () => {
     })
   })
 
-  test('Should submit signup form values and render success component', async () => {
+  test('Should submit signup form values and routes to success', async () => {
+    const push = jest.fn()
+    useRouter.mockImplementation(() => ({
+      push
+    }))
     signupHelper.signupUser = jest
       .fn()
       .mockReturnValue(Promise.resolve({ success: true }))
@@ -72,7 +78,8 @@ describe('Signup Page', () => {
       act(() => {
         fireEvent.click(submitButton)
       }),
-        expect(signupHelper.signupUser).toHaveBeenCalledTimes(1)
+        expect(signupHelper.signupUser).toHaveBeenCalledTimes(1),
+        expect(push).toHaveBeenCalledTimes(1)
     })
   })
 

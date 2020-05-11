@@ -1,6 +1,7 @@
 //import libraries
 import React, { useState } from 'react'
 import { Formik, Form, Field } from 'formik'
+import { useRouter } from 'next/router'
 
 //import components
 import Card from '../components/Card'
@@ -46,14 +47,6 @@ const ErrorMessage: React.FC<ErrorDisplayProps> = ({ signupErrors }) => {
     </div>
   )
 }
-
-const SignupSuccess: React.FC = () => (
-  <Card success title="Account created successfully!">
-    <NavLink path="/curriculum" className="btn btn-primary btn-lg mb-3">
-      Continue to Curriculum
-    </NavLink>
-  </Card>
-)
 
 const SignupForm: React.FC<SignupFormProps> = ({
   signupErrors,
@@ -128,23 +121,19 @@ const SignupForm: React.FC<SignupFormProps> = ({
 }
 
 const Signup: React.FC = () => {
-  const [signupSuccess, setSignupSuccess] = useState(false)
+  const router = useRouter()
   const [signupErrors, setSignupErrors] = useState({} as SignupErrors)
   const handleSubmit = async (values: Values) => {
     const data = await signupUser(values)
     if (data.success) {
-      setSignupSuccess(true)
+      router.push('/success')
     } else {
       setSignupErrors(Object.assign({}, data.errorMessage))
     }
   }
   return (
     <Layout>
-      {signupSuccess ? (
-        <SignupSuccess />
-      ) : (
-        <SignupForm handleSubmit={handleSubmit} signupErrors={signupErrors} />
-      )}
+      <SignupForm handleSubmit={handleSubmit} signupErrors={signupErrors} />
     </Layout>
   )
 }

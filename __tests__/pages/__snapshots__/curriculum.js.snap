@@ -546,9 +546,118 @@ exports[`Curriculum Page Should render data with lesson state inProgress 1`] = `
 
 exports[`Curriculum Page Should render ellpsis when no data is present 1`] = `
 <div>
-  <h1>
-    No Data...
-  </h1>
+  <nav
+    class="navbar navbar-expand-lg navbar-light justify-content-between bg-white"
+  >
+    <div
+      class="container"
+    >
+      <a
+        class="navbar-brand text-primary font-weight-bold"
+        href="/"
+      >
+        C0D3
+      </a>
+      <div
+        id="navbarNav"
+      >
+        <div
+          class="navbar-nav collapse navbar-collapse"
+        >
+          <div
+            class="navbar-nav collapse navbar-collapse"
+          >
+            <a
+              class="nav-item nav-link active"
+              href="/"
+            >
+              <span
+                class="sr-only"
+              >
+                (current)
+              </span>
+              Home
+            </a>
+            <a
+              class="nav-item nav-link"
+              href="/#learning"
+            >
+              Learning Process
+            </a>
+            <a
+              class="nav-item nav-link"
+              href="https://c0d3.com/book"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Resources
+            </a>
+            <a
+              class="nav-item nav-link"
+              href="https://chat.c0d3.com"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Help
+            </a>
+          </div>
+        </div>
+      </div>
+      <div>
+        <a
+          class="btn btn-secondary border mr-3"
+          href="/login"
+        >
+          Login
+        </a>
+        <a
+          class="btn btn-secondary border mr-3"
+          href="/signup"
+        >
+          Signup
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div
+    class="container"
+  >
+    <div
+      class="row mt-5"
+    >
+      <div
+        class="card shadow-sm col-sm-8 col-md-7 col-lg-6 col-xl-6 m-auto px-md-5 border-0"
+      >
+        <div
+          class="card-body text-center pt-5 pb-5"
+        >
+          <h1
+            class="card-title h2 font-weight-bold mb-5"
+          >
+            You must be logged in to access this page
+          </h1>
+          <p
+            class="card-text"
+          />
+          <div>
+            <a
+              class="border btn btn-primary overflow-hidden py-2 px-4"
+              href="/login"
+            >
+              Login
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer
+    class="mt-5 font-weight-light text-center pb-5 text-muted"
+  >
+    © Copyright 2020 GarageScript
+    <br />
+    All Rights Reserved
+  </footer>
 </div>
 `;
 

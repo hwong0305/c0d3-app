@@ -2,6 +2,7 @@ import React from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { DocumentNode } from 'apollo-boost'
 import LoadingSpinner from '../components/LoadingSpinner'
+import NoData from '../components/NoData'
 
 type QueryProps = {
   query: DocumentNode
@@ -26,7 +27,7 @@ const withQueryLoader = (
     return <Component queryData={data} {...props} />
   }
 
-  return <h1>No Data...</h1>
+  return <NoData />
 }
 
 export default withQueryLoader
