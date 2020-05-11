@@ -1,16 +1,17 @@
 import React from 'react'
 import { useRouter } from 'next/router'
+import _ from 'lodash'
 import Layout from '../../components/Layout'
 import Card from '../../components/Card'
 import Button from '../../components/Button'
 
 const ConfirmEmail = () => {
   const router = useRouter()
-  const { confirm } = router.query
+  const confirm = _.get(router, 'query.confirm', null)
   if (!confirm) {
     return (
       <Layout>
-        <Card fail={true} title="You already confirmed your email!">
+        <Card fail={true} title="Invalid Email Confirmation">
           <div>
             <Button
               btnType="border btn-primary overflow-hidden text-truncate py-2 px-4"
