@@ -22,7 +22,7 @@ const Card: React.FC<Props> = props => {
             <Checked className="mb-4" width="100px" height="100px" />
           )}
           {props.fail && (
-            <Failed className="mb-4" width="100px" height="100px" />
+            <Failed className="mb-4 text-danger" height="100px" width="100px" />
           )}
           <h1 className="card-title h2 font-weight-bold mb-5">{props.title}</h1>
           <p className="card-text">{props.text}</p>

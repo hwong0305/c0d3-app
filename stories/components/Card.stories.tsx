@@ -41,6 +41,14 @@ export const WithChildren: React.FC = () => (
   </Card>
 )
 
+export const WithFailure: React.FC = () => (
+  <Card
+    fail
+    title="Title of the card"
+    text="Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
+  />
+)
+
 export const WithSuccess: React.FC = () => (
   <Card
     success
