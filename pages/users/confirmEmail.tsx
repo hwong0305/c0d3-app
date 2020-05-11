@@ -4,10 +4,10 @@ import Layout from '../../components/Layout'
 import Card from '../../components/Card'
 import Button from '../../components/Button'
 
-const Confirm = () => {
+const ConfirmEmail = () => {
   const router = useRouter()
-  const { confirmString } = router.query
-  if (!confirmString) {
+  const { confirm } = router.query
+  if (!confirm) {
     return (
       <Layout>
         <Card fail={true} title="You already confirmed your email!">
@@ -36,4 +36,4 @@ const Confirm = () => {
   )
 }
 
-export default Confirm
+export default ConfirmEmail
