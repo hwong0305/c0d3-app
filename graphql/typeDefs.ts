@@ -49,6 +49,7 @@ export default gql`
     username: String
     userLesson: UserLesson
     email: String
+    emailVerificationToken: String
     name: String
     isAdmin: Boolean
   }

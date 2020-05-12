@@ -6,6 +6,7 @@ module.exports = withSass({
     DB_USER: process.env.DB_USER || 'herman',
     DB_PW: process.env.DB_PW || 'letmein2',
     DB_HOST: process.env.DB_HOST || 'devwong.com',
+    MAILGUN_API: process.env.MAIL_API || null,
     MATTERMOST_ACCESS_TOKEN:
       process.env.MATTERMOST_ACCESS_TOKEN || 'c1eh9rc1cinpbf9mk1wucjyqzw',
     SENTRY_DSN:

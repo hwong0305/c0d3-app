@@ -139,7 +139,7 @@ export const signup = async (
     // Chat Signup
     await chatSignUp(username, password, email)
 
-    const userRecord = User.create({
+    const userRecord = await User.create({
       name,
       username,
       password: hash,
@@ -148,6 +148,7 @@ export const signup = async (
     })
 
     return {
+      success: true,
       username: userRecord.username
     }
   } catch (err) {
@@ -171,7 +172,7 @@ export const confirmEmail = async (
   }
 
   if (!confirmEmail) {
-    throw new UserInputError('Email Confirmation Token was not provided')
+    throw new UserInputError('Email Confirmation Token is not provided')
   }
 
   const user = await User.findOne({
@@ -181,11 +182,11 @@ export const confirmEmail = async (
   })
 
   if (!user) {
-    throw new AuthenticationError('Current loggedin user is not valid')
+    throw new AuthenticationError('Current user is not valid')
   }
 
   if (confirmEmail !== user.emailVerificationToken) {
-    throw new UserInputError('Email Confirmation Token is not valid')
+    throw new UserInputError('Email Confirmation Token is not correct')
   }
 
   user.emailVerificationToken = ''

@@ -3,7 +3,7 @@ jest.mock('../dbload')
 jest.mock('../mattermost')
 import bcrypt from 'bcrypt'
 import db from '../dbload'
-import { login, logout, signup } from './authController'
+import { confirmEmail, login, logout, signup } from './authController'
 import { chatSignUp } from '../mattermost'
 
 describe('auth controller', () => {
@@ -138,7 +138,7 @@ describe('auth controller', () => {
     expect(db.User.create).not.toBeCalled()
   })
 
-  test('Signup - should resolve with success true if signup successful ', async () => {
+  test('Signup - should resolve with success true if signup successful', async () => {
     db.User.findOne = jest.fn().mockReturnValue(null)
     db.User.create = jest.fn().mockReturnValue({ username: 'user' })
     chatSignUp.mockResolvedValueOnce({
@@ -147,6 +147,78 @@ describe('auth controller', () => {
     const result = await signup({}, userArgs, { req: { session: {} } })
     expect(result).toEqual({
       username: 'user'
+    })
+  })
+
+  test('Confirm Email - should throw error if session is not signed in', async () => {
+    return expect(
+      confirmEmail({}, userArgs, { req: { session: {} } })
+    ).rejects.toThrowError('You must be logged in')
+  })
+
+  test('Confirm Email - should throw error if email verifcation token does not match', async () => {
+    const saveFunc = jest.fn()
+    db.User.findOne = jest.fn().mockReturnValue({
+      emailVerificationToken: '321',
+      save: saveFunc
+    })
+    expect(saveFunc).not.toBeCalled()
+    return expect(
+      confirmEmail(
+        {},
+        { confirmEmail: '123' },
+        { req: { session: { userId: 1 } } }
+      )
+    ).rejects.toThrowError('')
+  })
+
+  test('Confirm Email - should throw error if email verifcation token is not provided', async () => {
+    return expect(
+      confirmEmail({}, {}, { req: { session: { userId: 1 } } })
+    ).rejects.toThrowError('Email Confirmation Token is not provided')
+  })
+
+  test('Confirm Email - should throw error if user is not found from session', async () => {
+    db.User.findOne = jest.fn().mockReturnValue(null)
+    return expect(
+      confirmEmail(
+        {},
+        { confirmEmail: '123' },
+        { req: { session: { userId: 1 } } }
+      )
+    ).rejects.toThrowError('Current user is not valid')
+  })
+
+  test('Confirm Email - should throw error if email verifcation token does not match', async () => {
+    const saveFunc = jest.fn()
+    db.User.findOne = jest.fn().mockReturnValue({
+      emailVerificationToken: '321',
+      save: saveFunc
+    })
+    expect(saveFunc).not.toBeCalled()
+    return expect(
+      confirmEmail(
+        {},
+        { confirmEmail: '123' },
+        { req: { session: { userId: 1 } } }
+      )
+    ).rejects.toThrowError('Email Confirmation Token is not correct')
+  })
+
+  test('Confirm Email - should resolve with success if email verification token is correct', async () => {
+    const saveFunc = jest.fn()
+    db.User.findOne = jest.fn().mockReturnValue({
+      emailVerificationToken: '123',
+      save: saveFunc
+    })
+    const result = await confirmEmail(
+      {},
+      { confirmEmail: '123' },
+      { req: { session: { userId: 1 } } }
+    )
+    expect(saveFunc).toBeCalled()
+    expect(result).toEqual({
+      success: true
     })
   })
 })

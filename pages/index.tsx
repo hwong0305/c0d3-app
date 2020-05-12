@@ -1,21 +1,28 @@
 import * as React from 'react'
+import _ from 'lodash'
 import { useRouter } from 'next/router'
 import AppNav from '../components/AppNav'
 import LandingPage from '../components/LandingPage'
 import Footer from '../components/Footer'
-import SessionContext from '../helpers/contexts/session'
+import withQueryLoader, { WithQueryProps } from '../containers/withQueryLoader'
+import { GET_APP } from '../graphql/queries'
+import { Session } from '../@types/session'
 
-const IndexPage: any = () => {
+const IndexPage: React.FC<WithQueryProps> = ({ queryData }) => {
   const router = useRouter()
-  const { data } = React.useContext(SessionContext)
+  const { session }: { session: Session } = queryData
+  const emailVerificationToken = _.get(
+    session,
+    'user.emailVerificationToken',
+    null
+  )
 
-  // while loading, don't show anything to user
-  if (!data.errorMessage && !data.userInfo) {
+  if (session && emailVerificationToken) {
+    router.push('/success')
     return null
   }
 
-  // Route to curriculum is user is found
-  if (data.userInfo) {
+  if (session && !emailVerificationToken) {
     router.push('/curriculum')
     return null
   }
@@ -29,4 +36,9 @@ const IndexPage: any = () => {
   )
 }
 
-export default IndexPage
+export default withQueryLoader(
+  {
+    query: GET_APP
+  },
+  IndexPage
+)

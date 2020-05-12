@@ -1,6 +1,11 @@
 import { Request } from 'express'
 import db from '../helpers/dbload'
-import { confirmEmail, login, logout, signup } from '../helpers/controllers/authController'
+import {
+  confirmEmail,
+  login,
+  logout,
+  signup
+} from '../helpers/controllers/authController'
 import _ from 'lodash'
 
 const { User, Submission, Lesson, UserLesson } = db

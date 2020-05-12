@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Formik, Form, Field } from 'formik'
 import Input from '../components/Input'
 import { loginValidation } from '../helpers/formValidation'
@@ -6,7 +6,9 @@ import Layout from '../components/Layout'
 import Card from '../components/Card'
 import NavLink from '../components/NavLink'
 import Alert from '../components/Alert'
-import { loginUser } from '../helpers/loginUser'
+import { LOGIN_USER } from '../graphql/queries'
+import { useMutation } from '@apollo/react-hooks'
+import _ from 'lodash'
 
 const initialValues = {
   username: '',
@@ -20,14 +22,26 @@ type Values = {
 
 const Login: React.FC = () => {
   const [isAlertVisible, setIsAlertVisible] = useState(false)
-
+  const [alertText, setAlertText] = useState('')
+  const [loginUser, { data, error }] = useMutation(LOGIN_USER)
   // TODO: Error Handling for login / signup. Blocked by backend implementation.
-  const handleSubmit = async (values: Values) => {
-    const data = await loginUser(values.username, values.password)
-    if (data) {
-      return (window.location.pathname = '/curriculum')
+  useEffect(() => {
+    const { success } = _.get(data, 'login', false)
+    if (success) {
+      window.location.pathname = '/curriculum'
     }
-    setIsAlertVisible(true)
+    if (error) {
+      const message = _.get(error, 'message', '')
+      if (message) {
+        message.indexOf('Password') !== -1
+          ? setAlertText('Incorrect password: please try again')
+          : setAlertText('Incorrect username: please try again')
+      }
+      setIsAlertVisible(true)
+    }
+  })
+  const handleSubmit = async (values: Values) => {
+    await loginUser({ variables: values })
   }
   return (
     <Layout>
@@ -40,12 +54,7 @@ const Login: React.FC = () => {
         >
           <Form data-testid="form">
             <div className="form-group">
-              {isAlertVisible && (
-                <Alert
-                  error
-                  text="Incorrect username or password: please try again"
-                />
-              )}
+              {isAlertVisible && <Alert error text={alertText} />}
               <Field
                 name="username"
                 placeholder="Username"
