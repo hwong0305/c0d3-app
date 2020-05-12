@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { withNextRouter } from 'storybook-addon-next-router'
-import ConfirmComponent from '../pages/users/confirm'
+import ConfirmComponent from '../pages/confirmEmail/[confirm]'
 
 export default {
   title: 'Pages/confirm',
