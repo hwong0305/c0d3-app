@@ -1,24 +1,14 @@
 import React from 'react'
-import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks'
 import AppNav from './AppNav'
 import Footer from './Footer'
 import _ from 'lodash'
 
+import { GET_SESSION } from '../graphql/queries'
+
 type Props = {
   children: React.ReactElement
 }
-
-const GET_SESSION = gql`
-  {
-    session {
-      user {
-        id
-        username
-      }
-    }
-  }
-`
 
 const Layout: React.FC<Props> = ({ children }) => {
   const { loading, data } = useQuery(GET_SESSION)

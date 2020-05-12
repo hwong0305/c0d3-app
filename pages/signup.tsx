@@ -42,18 +42,6 @@ const ErrorMessage: React.FC<ErrorDisplayProps> = ({ signupErrors }) => {
   return <>{errorMessages}</>
 }
 
-const SignupSuccess: React.FC = () => (
-  <Card
-    success
-    data-testid="signup-success"
-    title="Account created successfully!"
-  >
-    <NavLink path="/curriculum" className="btn btn-primary btn-lg mb-3">
-      Continue to Curriculum
-    </NavLink>
-  </Card>
-)
-
 const SignupForm: React.FC<SignupFormProps> = ({
   signupErrors,
   isLoading,
@@ -135,7 +123,6 @@ const SignupForm: React.FC<SignupFormProps> = ({
 }
 
 const SignUpPage: React.FC = () => {
-  const [signupSuccess, setSignupSuccess] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [signupErrors, setSignupErrors] = useState<string[]>([])
   const [signupUser] = useMutation(SIGNUP_USER)
@@ -144,7 +131,9 @@ const SignUpPage: React.FC = () => {
     try {
       const { data } = await signupUser({ variables: values })
       if (data.signup.success) {
-        return setSignupSuccess(true)
+        // Using window so reload gets triggered
+        window.location.pathname = '/success'
+        return null
       }
       const err = new Error(
         'Server cannot be reached. Please try again. If this problem persists, please send an email to support@c0d3.com'
@@ -166,7 +155,6 @@ const SignUpPage: React.FC = () => {
     <Signup
       handleSubmit={handleSubmit}
       isLoading={isSubmitting}
-      isSuccess={signupSuccess}
       signupErrors={signupErrors}
     />
   )
@@ -174,21 +162,16 @@ const SignUpPage: React.FC = () => {
 
 export const Signup: React.FC<SignupFormProps> = ({
   handleSubmit,
-  isSuccess,
   signupErrors,
   isLoading
 }) => {
   return (
     <Layout>
-      {isSuccess ? (
-        <SignupSuccess />
-      ) : (
-        <SignupForm
-          handleSubmit={handleSubmit}
-          signupErrors={signupErrors}
-          isLoading={isLoading}
-        />
-      )}
+      <SignupForm
+        handleSubmit={handleSubmit}
+        signupErrors={signupErrors}
+        isLoading={isLoading}
+      />
     </Layout>
   )
 }

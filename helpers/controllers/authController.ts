@@ -1,13 +1,20 @@
 import db from '../dbload'
 import bcrypt from 'bcrypt'
 import _ from 'lodash'
+import mailgun from 'mailgun-js'
 import { nanoid } from 'nanoid'
 import { UserInputError, AuthenticationError } from 'apollo-server-micro'
+
 import { signupValidation } from '../formValidation'
 import { chatSignUp } from '../mattermost'
 import { LoggedRequest } from '../../@types/helpers'
 
 const { User } = db
+
+const CLIENT_URL = _.get(process, 'env.CLIENT_URL', 'https://c0d3.devwong.com')
+const MAILGUN_API_KEY = _.get(process, 'env.MAILGUN_API', '')
+const MAIL_DOMAIN = _.get(process, 'env.MAIL_DOMAIN', 'c0d3.com')
+const mgClient = mailgun({ apiKey: MAILGUN_API_KEY, domain: MAIL_DOMAIN })
 
 type Login = {
   username: string
@@ -96,6 +103,7 @@ export const signup = async (
   ctx: { req: LoggedRequest }
 ) => {
   const { req } = ctx
+  const { session } = req
   try {
     const { firstName, lastName, username, password, email } = arg
 
@@ -146,6 +154,25 @@ export const signup = async (
       email,
       emailVerificationToken: randomToken
     })
+
+    if (session) {
+      session.userId = userRecord.id
+    }
+
+    mgClient.messages().send(
+      {
+        from: '<hello@c0d3.com>',
+        to: email,
+        subject: 'Email verification',
+        text: `Your username is ${username}. Click on this link to verify your email ${CLIENT_URL}/confirmEmail/${randomToken}`
+      },
+      (error, body) => {
+        if (error) {
+          req.error(error)
+        }
+        req.info(`body of email ${body}`)
+      }
+    )
 
     return {
       success: true,

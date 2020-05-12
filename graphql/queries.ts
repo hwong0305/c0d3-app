@@ -101,6 +101,17 @@ export const GET_APP = gql`
   }
 `
 
+export const GET_SESSION = gql`
+  {
+    session {
+      user {
+        id
+        username
+      }
+    }
+  }
+`
+
 export const CONFIRM_EMAIL = gql`
   mutation confirmEmail($confirm: String!) {
     confirmEmail(confirmEmail: $confirm) {
