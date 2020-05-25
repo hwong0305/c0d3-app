@@ -117,9 +117,7 @@ export const signup = async (
 
     // Check for existing user or email
     const existingUser = await User.findOne({
-      where: {
-        username
-      }
+      where: { username }
     })
 
     if (existingUser) {
@@ -156,6 +154,57 @@ export const signup = async (
       success: true,
       username: userRecord.username
     }
+  } catch (err) {
+    if (!err.extensions) {
+      req.error(err)
+    }
+    throw new Error(err)
+  }
+}
+
+export const resetPassword = async (
+  _parent: void,
+  arg: { userOrEmail: string },
+  ctx: any
+) => {
+  const { req, session } = ctx
+  try {
+    if (!session) {
+      throw new Error('Session is not valid')
+    }
+
+    const { userOrEmail } = arg
+
+    if (!userOrEmail) {
+      throw new UserInputError('Please provider username or email')
+    }
+
+    let user
+
+    if (userOrEmail.indexOf('@') !== -1) {
+      user = await User.findOne({
+        where: { email: userOrEmail }
+      })
+    } else {
+      user = await User.findOne({
+        where: { username: userOrEmail }
+      })
+    }
+
+    if (!user) {
+      throw new UserInputError('The User does not exist')
+    }
+
+    const encodedToken = JSON.stringify({
+      userId: user.id,
+      userToken: nanoid()
+    })
+
+    user.forgotToken = Buffer.from(encodedToken).toString('base64')
+
+    await user.save()
+
+    return { success: true, token: user.forgotToken }
   } catch (err) {
     if (!err.extensions) {
       req.error(err)
