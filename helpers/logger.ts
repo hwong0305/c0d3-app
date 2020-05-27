@@ -42,7 +42,8 @@ export const winstonLogger = (sessionId: string) => {
       new Sentry({
         sentry: {
           dsn: SENTRY_DSN
-        }
+        },
+        level: 'warn'
       })
     ]
   })

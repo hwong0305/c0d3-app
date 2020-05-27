@@ -1,6 +1,7 @@
-import { Request } from 'express'
 import db from '../helpers/dbload'
-import { login, logout, signup } from '../helpers/controllers/authController'
+import { login, logout, signup } from '../helpers/controllers/loginController'
+import { LoggedRequest } from '../@types/helpers'
+import { changePw, reqPwReset } from '../helpers/controllers/passwordController'
 import _ from 'lodash'
 
 const { User, Submission, Lesson, UserLesson } = db
@@ -17,7 +18,7 @@ export default {
         order: [['order', 'ASC']]
       })
     },
-    submissions(_parent: void, arg: Submission, _context: { req: Request }) {
+    submissions(_parent: void, arg: Submission, _context: LoggedRequest) {
       const { lessonId } = arg
       return Submission.findAll({
         where: {
@@ -26,7 +27,7 @@ export default {
         }
       })
     },
-    async session(_parent: void, _args: void, context: { req: Request }) {
+    async session(_parent: void, _args: void, context: LoggedRequest) {
       const userId = _.get(context, 'req.session.userId', false)
 
       if (!userId) {
@@ -57,8 +58,10 @@ export default {
   },
 
   Mutation: {
+    changePw,
     login,
     logout,
+    reqPwReset,
     signup
   }
 }

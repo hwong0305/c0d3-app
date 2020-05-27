@@ -8,8 +8,10 @@ export default gql`
   }
 
   type Mutation {
+    changePassword(token: String!, password: String!): ForgotTokenResponse
     login(username: String!, password: String!): AuthResponse
     logout: AuthResponse
+    requestPasswordReset(userOrEmail: String!): ForgotTokenResponse
     signup(
       firstName: String!
       lastName: String!
@@ -23,6 +25,11 @@ export default gql`
     success: Boolean
     username: String
     error: String
+  }
+
+  type ForgotTokenResponse {
+    success: Boolean
+    token: String
   }
 
   type Submission {

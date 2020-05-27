@@ -21,8 +21,8 @@ describe('Chat Signup', () => {
     ).resolves.toEqual({ success: true })
   })
 
-  test('ChatSignUp - should reject with invalid parameter if response is 401', async () => {
-    fetch.mockResolvedValue({ status: 401 })
+  test('ChatSignUp - should reject with invalid parameter if response is 400', async () => {
+    fetch.mockResolvedValue({ status: 400 })
     return expect(
       chatSignUp(userArgs.username, userArgs.password, userArgs.email)
     ).rejects.toThrowError('Invalid or missing parameter in mattermost request')
@@ -36,7 +36,7 @@ describe('Chat Signup', () => {
   })
 
   test('ChatSignUp - should reject if response status is invalid', async () => {
-    fetch.mockResolvedValue({ status: 418 }) // MatterMost only returns 201, 401 and 403 LOL teapot
+    fetch.mockResolvedValue({ status: 418 }) // MatterMost only returns 201, 400 and 403 LOL teapot
     return expect(
       chatSignUp(userArgs.username, userArgs.password, userArgs.email)
     ).rejects.toThrowError('Unexpected Response')

@@ -4,7 +4,9 @@ import { nanoid } from 'nanoid'
 import { UserInputError, AuthenticationError } from 'apollo-server-micro'
 import { signupValidation } from '../formValidation'
 import { chatSignUp } from '../mattermost'
-import { LoggedRequest } from '../../@types/helpers'
+import { Context } from '../../@types/helpers'
+import { sendSignupEmail } from '../mail'
+import { encode } from '../encoding'
 
 const { User } = db
 
@@ -21,11 +23,7 @@ type SignUp = {
   email: string
 }
 
-export const login = async (
-  _parent: void,
-  arg: Login,
-  ctx: { req: LoggedRequest }
-) => {
+export const login = async (_parent: void, arg: Login, ctx: Context) => {
   const { req } = ctx
   try {
     const { session } = req
@@ -58,11 +56,7 @@ export const login = async (
   }
 }
 
-export const logout = async (
-  _parent: void,
-  _: void,
-  ctx: { req: LoggedRequest }
-) => {
+export const logout = async (_parent: void, _: void, ctx: Context) => {
   const { req } = ctx
   const { session } = req
   return new Promise(async (resolve, reject) => {
@@ -76,7 +70,7 @@ export const logout = async (
     session.destroy(err => {
       if (err) {
         req.error(err)
-        reject({
+        return reject({
           success: false,
           error: err.message
         })
@@ -89,15 +83,12 @@ export const logout = async (
   })
 }
 
-export const signup = async (
-  _parent: void,
-  arg: SignUp,
-  ctx: { req: LoggedRequest }
-) => {
+export const signup = async (_parent: void, arg: SignUp, ctx: Context) => {
   const { req } = ctx
   try {
     const { session } = req
-    const { firstName, lastName, username, password, email } = arg
+    // const { firstName, lastName, username, password, email } = arg
+    const { firstName, lastName, username, email } = arg
 
     if (!session) {
       throw new Error('Session Error')
@@ -107,10 +98,8 @@ export const signup = async (
       firstName,
       lastName,
       username,
-      password,
       email
     })
-
     if (!validEntry) {
       throw new UserInputError('Register form is not completely filled out')
     }
@@ -125,86 +114,36 @@ export const signup = async (
     }
 
     const existingEmail = await User.findOne({
-      where: {
-        email
-      }
+      where: { email }
     })
 
     if (existingEmail) {
       throw new UserInputError('Email already exists')
     }
 
-    const randomToken = nanoid()
+    // await chatSignUp(username, password, email)
+    await chatSignUp(username, email)
+
+    const THREE_DAYS = 1000 * 60 * 60 * 24 * 3
     const name = `${firstName} ${lastName}`
-    const hash = await bcrypt.hash(password, 10)
-
-    // Chat Signup
-    await chatSignUp(username, password, email)
-
     const userRecord = await User.create({
       name,
       username,
-      password: hash,
       email,
-      emailVerificationToken: randomToken
+      // password,
+      expiration: new Date(Date.now() + THREE_DAYS)
     })
 
-    session.userId = userRecord.dataValues.id
+    const encodedToken = encode({ userId: userRecord.id, token: nanoid() })
+    userRecord.forgotToken = encodedToken
+    await userRecord.save()
+
+    sendSignupEmail(userRecord.email, userRecord.forgotToken)
+
     return {
       success: true,
       username: userRecord.username
     }
-  } catch (err) {
-    if (!err.extensions) {
-      req.error(err)
-    }
-    throw new Error(err)
-  }
-}
-
-export const resetPassword = async (
-  _parent: void,
-  arg: { userOrEmail: string },
-  ctx: any
-) => {
-  const { req, session } = ctx
-  try {
-    if (!session) {
-      throw new Error('Session is not valid')
-    }
-
-    const { userOrEmail } = arg
-
-    if (!userOrEmail) {
-      throw new UserInputError('Please provider username or email')
-    }
-
-    let user
-
-    if (userOrEmail.indexOf('@') !== -1) {
-      user = await User.findOne({
-        where: { email: userOrEmail }
-      })
-    } else {
-      user = await User.findOne({
-        where: { username: userOrEmail }
-      })
-    }
-
-    if (!user) {
-      throw new UserInputError('The User does not exist')
-    }
-
-    const encodedToken = JSON.stringify({
-      userId: user.id,
-      userToken: nanoid()
-    })
-
-    user.forgotToken = Buffer.from(encodedToken).toString('base64')
-
-    await user.save()
-
-    return { success: true, token: user.forgotToken }
   } catch (err) {
     if (!err.extensions) {
       req.error(err)

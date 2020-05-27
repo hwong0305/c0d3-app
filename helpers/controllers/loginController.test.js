@@ -3,7 +3,7 @@ jest.mock('../dbload')
 jest.mock('../mattermost')
 import bcrypt from 'bcrypt'
 import db from '../dbload'
-import { login, logout, signup } from './authController'
+import { login, logout, signup } from './loginController'
 import { chatSignUp } from '../mattermost'
 
 describe('auth controller', () => {
@@ -140,9 +140,11 @@ describe('auth controller', () => {
 
   test('Signup - should resolve with success true if signup successful ', async () => {
     db.User.findOne = jest.fn().mockReturnValue(null)
-    db.User.create = jest
-      .fn()
-      .mockReturnValue({ username: 'user', dataValues: { id: '1234' } })
+    db.User.create = jest.fn().mockReturnValue({
+      username: 'user',
+      dataValues: { id: '1234' },
+      save: jest.fn()
+    })
     chatSignUp.mockResolvedValueOnce({
       success: true
     })
